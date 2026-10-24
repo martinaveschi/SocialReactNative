@@ -1,0 +1,69 @@
+import {useState} from "react";
+import {View, Text, TextInput, Button, StyleSheet} from "react-native";
+import axios from "axios";
+
+export default function LoginScreen() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    function handleLogin(){
+        axios
+            .post("http://192.168.1.110/api/login.php", {
+                username: username,
+                password: password
+            }) 
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+            .finally(() => {
+                console.log("Request completed");
+            });
+    }
+    return (
+        <View style={styles.mainContainer}>
+            <View style={styles.container}>
+                <Text style={styles.loginText}>Username</Text>
+                <TextInput style={styles.loginTextInput} value={username} onChangeText={setUsername}/>
+                <Text style={styles.loginText}>Password</Text>
+                <TextInput style={styles.loginTextInput} secureTextEntry={true} value={password} onChangeText={setPassword}/>
+                <Button color="#DEB887" title="Login" onPress={handleLogin}/>
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create ({
+    mainContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'bisque',
+    },
+    container: {
+        alignItems: 'center',
+        borderColor: 'black',
+        backgroundColor: 'white',      
+        borderWidth: 1,
+        borderRadius: 10,
+        width: '75%',
+        padding: 10,
+    },
+    loginText: {
+        fontWeight: 'bold',
+        fontSize: 10,
+        color: 'black',
+        padding: 5,
+    },
+    loginTextInput: {
+        fontWeight: 'thin',
+        fontSize: 10,
+        color: 'black',
+        borderColor: 'black',
+        borderWidth: 1,
+        width: '50%',
+        paddingBottom: 5,
+        margin: 5,
+    }
+})
