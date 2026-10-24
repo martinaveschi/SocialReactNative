@@ -2,7 +2,7 @@ import {useState} from "react";
 import {View, Text, TextInput, Button, StyleSheet} from "react-native";
 import axios from "axios";
 
-export default function LoginScreen() {
+export default function LoginScreen({onLogin}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     function handleLogin(){
@@ -10,15 +10,16 @@ export default function LoginScreen() {
             .post("http://192.168.1.110/api/login.php", {
                 username: username,
                 password: password
-            }) 
+            })
             .then((response) => {
-                console.log(response.data);
+                if (response.data.token) {
+                    onLogin(response.data.token);
+                } else {
+                    alert(response.data.error);
+                }
             })
             .catch((error) => {
-                console.error(error);
-            })
-            .finally(() => {
-                console.log("Request completed");
+                alert('Impossibile contattare il server: ' + error.message);
             });
     }
     return (
@@ -54,6 +55,11 @@ const styles = StyleSheet.create ({
         fontWeight: 'bold',
         fontSize: 10,
         color: 'black',
+        padding: 5,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 10,
         padding: 5,
     },
     loginTextInput: {
