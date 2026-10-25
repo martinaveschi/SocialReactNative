@@ -3,7 +3,7 @@
 require_once 'DbConnector.php';
 require_once 'TokenManager.php';
 
-echo print_r($_SERVER, true);
+header('Content-Type: application/json');
 $errorCode = null;
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $post = json_decode(file_get_contents('php://input'), true);

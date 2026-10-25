@@ -69,7 +69,7 @@ export default function HomeScreen({token, onLogout}){
     axios
       .get("http://192.168.1.110/api/messages.php", {
         headers: {
-          Authorization: "Bearer bfd2109ced03357b884d24e9a9f8087f1b2de1812f6f712db9a1e9910b3ffa6265beb5eb791997fd35cab085008ac058ba11edbba794e0b3d5dc2ca52c89408b.eyJpZCI6MTAsImV4cCI6MTc4MTI3OTE5MH0=" ,
+          Authorization: "Bearer" + token
         },
       })
       .then((response) => {
