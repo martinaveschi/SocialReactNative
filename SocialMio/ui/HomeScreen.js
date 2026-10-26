@@ -41,38 +41,65 @@ export default function HomeScreen({token, onLogout}){
   // ]
 
   function handleDelete(id) {
-    //console.log(id);
-    // filtro la lista e mi restituisce un'altra lista; nuova lista che passo a setMessages
-    setMessages ( messages.filter(message => message.id !== id));
+    axios
+      .post("http://192.168.1.110/api/deleteMessage.php",
+      //.post("http://10.10.53.237/api/deleteMessage.php",
+        { postId: id },
+        { headers: { Authorization: "Bearer " + token } })
+      .then(() => {
+        // filtro la lista e mi restituisce un'altra lista; nuova lista che passo a setMessages
+        setMessages(messages.filter(message => message.id !== id));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function handlePost(content) {
     axios
-      .post("http://10.10.53.237/api/createMessages.php",
+      .post("http://192.168.1.110/api/createMessages.php",
+      //.post("http://10.10.53.237/api/createMessages.php",
         {
           content: content
         },
-        { headers: Authorization: "Bearer " + token
-        },
+        {
+          headers: {
+            Authorization: "Bearer " + token
+          },
+        })
+      .then(() => {
+        // il post è salvato: ricarico la lista per mostrarlo
+        loadPosts();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   function handleEdit(id, newText) {
-  setMessages(messages.map(message => {
-    if (message.id === id) {
-      return { ...message, text: newText };
-    } else {
-      return message;
-    }
-  }));
-}
+    axios
+      .post("http://192.168.1.110/api/editMessage.php",
+      //.post("http://10.10.53.237/api/editMessage.php",
+        { postId: id, content: newText },
+        { headers: { Authorization: "Bearer " + token } })
+      .then(() => {
+        // la lista usa il campo "content" (non "text")
+        setMessages(messages.map(message =>
+          message.id === id ? { ...message, content: newText } : message
+        ));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   function loadPosts() {
     console.log("loading");
     axios
       // url casa
-      // .get("http://192.168.1.110/api/messages.php",
+      .get("http://192.168.1.110/api/messages.php",
       //url scuola
-      .get(`http://10.10.53.237/api/messages.php?page=1`,
+      //.get(`http://10.10.53.237/api/messages.php?page=1`,
       {
         headers: {
           Authorization: "Bearer " + token
@@ -82,6 +109,11 @@ export default function HomeScreen({token, onLogout}){
         setMessages(response.data.messages);
       })
       .catch((error) => {
+        // token scaduto o non valido: torno al login per ottenerne uno nuovo
+        if (error.response?.status === 401) {
+          onLogout();
+          return;
+        }
         console.error(error);
       })
       .finally(() => {

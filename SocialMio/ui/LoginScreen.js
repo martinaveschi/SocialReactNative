@@ -10,8 +10,8 @@ export default function LoginScreen({onLogin}) {
     function handleLogin(){
         axios
             // url casa
-            // .post("http://192.168.1.110/api/login.php",
-            .post("http://10.10.53.237/api/login.php",
+            .post("http://192.168.1.110/api/login.php",
+            //.post("http://10.10.53.237/api/login.php",
             {
                 username: username,
                 password: password
@@ -27,30 +27,13 @@ export default function LoginScreen({onLogin}) {
                 alert('Impossibile contattare il server: ' + error.message);
             });
     }
-    function handleRegistration(){
-        if(!username || !password || !confirmPassword) {
-            alert("Inserisci username e password");
-            return;
-        }
-        axios
-            // url casa
-            // .post("http://192.168.1.110/api/login.php",
-            .post("http://10.10.53.237/api/registration.php",
-            {
-                username: username,
-                password: password,
-                confirmPassword: confirmPassword
-            })
-            .then((response) => {
-                if (response.data) {
-                    onRegistration(response.data);
-                } else {
-                    alert(response.data.error);
-                }
-            })
-            .catch((error) => {
-                alert('Impossibile contattare il server: ' + error.message);
-            });
+    if (view === "register") {
+        return (
+            <RegistrationScreen
+                onRegistered={() => setView("login")}
+                onCancel={() => setView("login")}
+            />
+        );
     }
     return (
         <View style={styles.mainContainer}>
@@ -60,12 +43,7 @@ export default function LoginScreen({onLogin}) {
                 <Text style={styles.loginText}>Password</Text>
                 <TextInput style={styles.loginTextInput} secureTextEntry={true} value={password} onChangeText={setPassword}/>
                 <Button color="#DEB887" title="Login" onPress={handleLogin}/>
-                {view === "login" && (
-                    <Button title="Registrati" onPress={() => setView("register")} />
-                )}
-                {view === "register" && (
-                    <RegisterScreen onRegistration={handleRegistration} />
-                )}
+                <Button title="Registrati" onPress={() => setView("register")} />
             </View>
         </View>
     );
