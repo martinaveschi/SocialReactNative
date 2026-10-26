@@ -7,7 +7,10 @@ export default function LoginScreen({onLogin}) {
     const [password, setPassword] = useState('');
     function handleLogin(){
         axios
-            .post("http://192.168.1.110/api/login.php", {
+            // url casa
+            // .post("http://192.168.1.110/api/login.php",
+            .post("http://10.10.53.237/api/login.php",
+            {
                 username: username,
                 password: password
             })

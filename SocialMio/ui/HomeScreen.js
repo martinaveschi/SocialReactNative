@@ -2,39 +2,43 @@ import { StatusBar } from 'expo-status-bar';
 import {StyleSheet, View, Text, Button, FlatList } from 'react-native';
 import InputMessages from "./InputMessages";
 import Messages from "./Messages";
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import axios from "axios";
 
 export default function HomeScreen({token, onLogout}){
-    const [newId, setId] = useState();
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      username: 'Martina',
-      text: 'Yoshi è bello',
-      date: 28052026
-    }, {
-      id: 2,
-      username: 'Alessandro',
-      text: 'Abbasso il Senato',
-      date: 28052026
-    }, {
-      id: 3,
-      username: 'Riccardo',
-      text: 'Amo Yoshi',
-      date: 28052026
-    }, {
-      id: 4,
-      username: 'Damiano',
-      text: 'Forza Lazio',
-      date: 28052026
-    }, {
-      id: 5,
-      username: 'Marco',
-      text: 'Martina è la mia figlia preferita',
-      date: 28052026
-    }
-  ]);
+  const [newId, setId] = useState();
+  const [messages, setMessages] = useState([]);
+  useEffect(() => {
+    loadPosts();
+  }, [token]); 
+  // [
+  //   {
+  //     id: 1,
+  //     username: 'Martina',
+  //     text: 'Yoshi è bello',
+  //     date: 28052026
+  //   }, {
+  //     id: 2,
+  //     username: 'Alessandro',
+  //     text: 'Abbasso il Senato',
+  //     date: 28052026
+  //   }, {
+  //     id: 3,
+  //     username: 'Riccardo',
+  //     text: 'Amo Yoshi',
+  //     date: 28052026
+  //   }, {
+  //     id: 4,
+  //     username: 'Damiano',
+  //     text: 'Forza Lazio',
+  //     date: 28052026
+  //   }, {
+  //     id: 5,
+  //     username: 'Marco',
+  //     text: 'Martina è la mia figlia preferita',
+  //     date: 28052026
+  //   }
+  // ]
 
   function handleDelete(id) {
     //console.log(id);
@@ -66,14 +70,19 @@ export default function HomeScreen({token, onLogout}){
 }
 
   function loadPosts() {
+    console.log("loading");
     axios
-      .get("http://192.168.1.110/api/messages.php", {
+      // url casa
+      // .get("http://192.168.1.110/api/messages.php",
+      //url scuola
+      .get(`http://10.10.53.237/api/messages.php?page=1`,
+      {
         headers: {
-          Authorization: "Bearer" + token
+          Authorization: "Bearer " + token
         },
       })
       .then((response) => {
-        console.log(response.data);
+        setMessages(response.data.messages);
       })
       .catch((error) => {
         console.error(error);
@@ -95,24 +104,24 @@ export default function HomeScreen({token, onLogout}){
         <InputMessages inputMessageLabel='What are you thinking about?' messageButton='Send your post' onMessagePostPress={handlePost}/>
       </View>
       <View style={styles.view}>
-        <FlatList data={messages}
-                  keyExtractor={message => message.id}
-                  renderItem={(message) => (
-                    <Messages userName={message.item.username}
-                              textMessage={message.item.text}
-                              dateTime={message.item.date}
-                              id={message.item.id}
-                              onMessageDeletePress={handleDelete}
-                              onMessageSavePress={handleEdit}
-                              modifyButton='Modifica'
-                              deleteButton='Elimina'
-                              saveButton='Salva'
-                              cancelButton='Annulla'/>)
-                  }
+        <FlatList
+          data={messages}
+          keyExtractor={(m) => m.id.toString()}
+          renderItem={({ item }) => (
+            <Messages
+              id={item.id}
+              userName={item.username}
+              textMessage={item.content}
+              dateTime={item.creation_date}
+              onMessageDeletePress={handleDelete}
+              onMessageSavePress={handleEdit}
+              modifyButton="Modifica"
+              deleteButton="Elimina"
+              saveButton="Salva"
+              cancelButton="Annulla"
+            />
+          )}
         />
-      </View>
-      <View>
-        <Button title="Scarica messaggi" onPress={loadPosts}></Button>
       </View>
 
       <StatusBar style="auto" />
