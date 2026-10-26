@@ -47,16 +47,13 @@ export default function HomeScreen({token, onLogout}){
   }
 
   function handlePost(content) {
-    const newId = Math.max(...messages.map(m => m.id))+1;
-    setMessages([
-      ...messages,
-      {
-        id: newId,
-        username: 'Yoshi',
-        text: content,
-        date: Date.now()
-      }
-    ]);
+    axios
+      .post("http://10.10.53.237/api/createMessages.php",
+        {
+          content: content
+        },
+        { headers: Authorization: "Bearer " + token
+        },
   }
 
   function handleEdit(id, newText) {
